@@ -1,0 +1,163 @@
+1.0 **********************count ****************************
+import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+
+function App() {
+    // Access Redux state and dispatch
+    const count = useSelector((state) => state.count); // Ensure you access the `count` property
+    const dispatch = useDispatch();
+
+    const [isCountVisible, setIsCountVisible] = useState(true);
+
+    return (
+        <div>
+            {isCountVisible && <div>Count: {count}</div>}
+            <br />
+            <button onClick={() => dispatch({ type: 'ADD', payload: 1 })}>Add</button>
+            <button onClick={() => dispatch({ type: 'SUBTRACT', payload: 1 })}>Subtract</button>
+            <button onClick={() => setIsCountVisible(!isCountVisible)}>
+                {isCountVisible ? 'Hide Count' : 'Show Count'}
+            </button>
+        </div>
+    );
+}
+
+export default App;
+
+
+1.0 ********************** multiple reducers ****************************
+  1.1 ********************** app.tsx ****************************
+
+import React from 'react';
+import { Provider } from 'react-redux';
+import store from './store/Store.ts';  // Import the store
+import CustomerComponent from './componets/CustomerComponent.tsx';
+import ItemComponent from './componets/ItemComponet.tsx';
+
+const App = () => {
+    return (
+        <Provider store={store}>
+            <div>
+                <h1>Customer and Item Management</h1>
+                <CustomerComponent />
+                <ItemComponent />
+            </div>
+        </Provider>
+    );
+};
+
+export default App;
+
+ 1.2 ********************** customer componet ****************************
+
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store/Store.ts';  // Access RootState from store.ts
+
+const CustomerComponent = () => {
+    const [customerName, setCustomerName] = useState('');
+    const dispatch = useDispatch();
+    const customers = useSelector((state: RootState) => state.customer.customerList);
+
+    const addCustomer = () => {
+        if (customerName) {
+            dispatch({ type: 'ADD_CUSTOMER', payload: customerName });
+            setCustomerName('');
+        }
+    };
+
+    return (
+        <div>
+            <h2>Customer Management</h2>
+            <input
+                type="text"
+                placeholder="Enter Customer Name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+            />
+            <button onClick={addCustomer}>Add Customer</button>
+            <ul>
+                {customers.map((customer, index) => (
+                    <li key={index}>{customer}</li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default CustomerComponent;
+
+ 1.3 ********************** item componet ****************************
+ import React, { useState } from 'react';
+ import { useSelector, useDispatch } from 'react-redux';
+ import { RootState } from '../store/Store.ts';  // Access RootState from store.ts
+
+ const ItemComponent = () => {
+     const [itemName, setItemName] = useState('');
+     const dispatch = useDispatch();
+     const items = useSelector((state: RootState) => state.item.itemList);
+
+     const addItem = () => {
+         if (itemName) {
+             dispatch({ type: 'ADD_ITEM', payload: itemName });
+             setItemName('');
+         }
+     };
+
+     return (
+         <div>
+             <h2>Item Management</h2>
+             <input
+                 type="text"
+                 placeholder="Enter Item Name"
+                 value={itemName}
+                 onChange={(e) => setItemName(e.target.value)}
+             />
+             <button onClick={addItem}>Add Item</button>
+             <ul>
+                 {items.map((item, index) => (
+                     <li key={index}>{item}</li>
+                 ))}
+             </ul>
+         </div>
+     );
+ };
+
+ export default ItemComponent;
+ 1.4********************** store.ts****************************
+ import { createStore, combineReducers } from 'redux';
+ import CustomerReducer from '../reducer/CustomerReducer';  // Import Customer Reducer
+ import ItemReducer from '../reducer/ItemReducer';  // Import Item Reducer
+
+ // Combine Reducers
+ const rootReducer = combineReducers({
+     customer: CustomerReducer,
+     item: ItemReducer,
+ });
+
+ // Create Redux Store
+ const store = createStore(rootReducer);
+
+ export default store;
+
+ 1.5********************** customer reducer****************************
+ const initialState = {
+     customerList: [],
+ };
+
+ const CustomerReducer = (state = initialState, action: any) => {
+     switch (action.type) {
+         case 'ADD_CUSTOMER':
+             return { ...state, customerList: [...state.customerList, action.payload] };
+         default:
+             return state;
+     }
+ };
+
+ export default CustomerReducer;
+
+
+
+
+

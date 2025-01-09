@@ -1,5 +1,15 @@
-import { createStore } from 'redux';
-import { CountReducer } from '../reducer/CountReducer.ts';
+import { configureStore } from '@reduxjs/toolkit';
+import customerReducer from '../reducer/CustomerReducer.ts';
+import itemReducer from '../reducer/ItemReducer.ts';
 
-// Create the Redux store
-export const store = createStore(CountReducer);
+const store = configureStore({
+    reducer: {
+        customer: customerReducer,
+        item: itemReducer,
+    },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store;
